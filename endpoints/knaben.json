@@ -1,0 +1,13 @@
+{
+  "id": "knaben",
+  "name": "Knaben",
+  "version": 1,
+  "lang": "all",
+  "kind": "rss",
+  "url": "https://rss.knaben.org/{query}/0//hidexxx",
+  "auth": [],
+  "front": null,
+  "rate": { "per_minute": 20 },
+  "nsfw": false,
+  "min_core": "2.1.0"
+}
