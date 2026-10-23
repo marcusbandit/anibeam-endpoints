@@ -33,10 +33,13 @@ jobs:
           printf '%s\n' "$SIGNING_KEY" > "$RUNNER_TEMP/key.pem"
           scripts/build-index.sh "$RUNNER_TEMP/key.pem"
           rm -f "$RUNNER_TEMP/key.pem"
-      - name: Commit the index if it changed
+          scripts/verify.sh repo.json >/dev/null
+      - name: Commit the index if the endpoints changed
         run: |
-          git add index.json index.json.sig
-          if git diff --cached --quiet; then exit 0; fi
+          old=$(git show HEAD:repo.json 2>/dev/null | jq -r .payload | base64 -d | jq -c .endpoints || true)
+          new=$(jq -r .payload repo.json | base64 -d | jq -c .endpoints)
+          if [ "$old" = "$new" ]; then exit 0; fi
+          git add repo.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "chore(index): rebuild and sign [skip ci]"
