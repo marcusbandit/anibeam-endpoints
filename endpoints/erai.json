@@ -1,0 +1,21 @@
+{
+  "id": "erai",
+  "name": "Erai-raws",
+  "version": 1,
+  "lang": "en",
+  "kind": "rss",
+  "url": "https://www.erai-raws.info/episodes/feed/?res=1080p&type=torrent&subs%5B0%5D=us&s={query}&token={token}",
+  "auth": [
+    {
+      "key": "token",
+      "label": "RSS token",
+      "secret": true,
+      "help": "Log in on erai-raws.info, open the RSS page and copy the token= value from any feed link.",
+      "help_url": "https://www.erai-raws.info/rss-page/"
+    }
+  ],
+  "front": null,
+  "rate": { "per_minute": 20 },
+  "nsfw": false,
+  "min_core": "2.1.0"
+}
