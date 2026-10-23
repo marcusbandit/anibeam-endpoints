@@ -1,0 +1,15 @@
+{
+  "id": "nyaa",
+  "name": "Nyaa",
+  "version": 1,
+  "lang": "all",
+  "kind": "nyaa",
+  "url": "https://nyaa.si/",
+  "auth": [],
+  "front": "ddos-guard.net",
+  "rate": { "per_minute": 30 },
+  "nsfw": false,
+  "category": "1_0",
+  "filter": "0",
+  "min_core": "2.1.0"
+}
