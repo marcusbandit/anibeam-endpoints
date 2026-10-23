@@ -22,7 +22,12 @@ for f in "${files[@]}"; do
   seen[$id]=1
 
   url=$(jq -r .url "$f")
-  [[ "$url" == *"{query}"* ]] || err "$f: url has no {query} placeholder"
+  if [[ $(jq -r .kind "$f") == nyaa ]]; then
+    # The core appends ?page=rss&q=...&c=...&f=... to a nyaa url itself.
+    [[ "$url" != *"?"* && "$url" != *"{query}"* ]] || err "$f: a nyaa url is the bare site, with no query string"
+  else
+    [[ "$url" == *"{query}"* ]] || err "$f: url has no {query} placeholder"
+  fi
   while read -r key; do
     [[ -z "$key" || "$url" == *"{$key}"* ]] || err "$f: auth key \"$key\" never appears in url"
   done < <(jq -r '.auth[].key' "$f")
