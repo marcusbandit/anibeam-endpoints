@@ -1,0 +1,13 @@
+{
+  "id": "limetorrents",
+  "name": "LimeTorrents",
+  "version": 1,
+  "lang": "all",
+  "kind": "rss",
+  "url": "https://www.limetorrents.fun/searchrss/{query}/",
+  "auth": [],
+  "front": null,
+  "rate": { "per_minute": 20 },
+  "nsfw": false,
+  "min_core": "2.1.0"
+}
