@@ -1,0 +1,13 @@
+{
+  "id": "animetosho",
+  "name": "AnimeTosho",
+  "version": 1,
+  "lang": "all",
+  "kind": "tosho",
+  "url": "https://animetosho.org/feed/json?q={query}",
+  "auth": [],
+  "front": null,
+  "rate": { "per_minute": 30 },
+  "nsfw": false,
+  "min_core": "2.1.0"
+}
