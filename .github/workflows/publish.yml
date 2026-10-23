@@ -1,0 +1,43 @@
+name: check and publish
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: pipx install check-jsonschema
+      - name: Check definitions
+        run: scripts/check.sh ${{ github.event_name == 'pull_request' && 'origin/main' || '' }}
+
+  publish:
+    needs: check
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and sign the index
+        env:
+          SIGNING_KEY: ${{ secrets.ENDPOINTS_SIGNING_KEY }}
+        run: |
+          umask 077
+          printf '%s\n' "$SIGNING_KEY" > "$RUNNER_TEMP/key.pem"
+          scripts/build-index.sh "$RUNNER_TEMP/key.pem"
+          rm -f "$RUNNER_TEMP/key.pem"
+      - name: Commit the index if it changed
+        run: |
+          git add index.json index.json.sig
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(index): rebuild and sign [skip ci]"
+          git push

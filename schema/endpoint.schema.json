@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/marcusbandit/anibeam-endpoints/schema/endpoint.schema.json",
+  "title": "AniBeam endpoint definition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "version", "lang", "kind", "url", "auth", "min_core"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "integer", "minimum": 1 },
+    "lang": { "type": "string", "pattern": "^([a-z]{2}|all)$" },
+    "kind": { "enum": ["nyaa", "rss", "tosho"] },
+    "url": { "type": "string", "pattern": "^https://" },
+    "auth": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "label", "secret"],
+        "properties": {
+          "key": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "label": { "type": "string", "minLength": 1 },
+          "secret": { "type": "boolean" },
+          "help": { "type": "string" },
+          "help_url": { "type": "string", "pattern": "^https://" }
+        }
+      }
+    },
+    "front": { "type": ["string", "null"] },
+    "rate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["per_minute"],
+      "properties": { "per_minute": { "type": "integer", "minimum": 1 } }
+    },
+    "nsfw": { "type": "boolean" },
+    "category": { "type": "string" },
+    "filter": { "type": "string" },
+    "min_core": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" }
+  }
+}
