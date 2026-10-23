@@ -1,0 +1,13 @@
+{
+  "id": "subsplease",
+  "name": "SubsPlease",
+  "version": 1,
+  "lang": "en",
+  "kind": "rss",
+  "url": "https://nyaa.si/?page=rss&u=subsplease&q={query}&c=1_2&f=0",
+  "auth": [],
+  "front": "ddos-guard.net",
+  "rate": { "per_minute": 30 },
+  "nsfw": false,
+  "min_core": "2.1.0"
+}
