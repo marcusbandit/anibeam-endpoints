@@ -14,7 +14,12 @@ trap 'rm -rf "$tmp"' EXIT
 mkdir -p index
 
 shopt -s nullglob
-for group in $(jq -r 'keys[]' groups.json); do
+# A group dropped from groups.json loses its index too, so its raw URL stops serving a frozen list.
+for f in index/*.json; do
+  jq -e --arg g "$(basename "$f" .json)" 'has($g)' groups.json >/dev/null || rm -f "$f"
+done
+
+while read -r group; do
   files=(endpoints/"$group"/*.json)
   if ((${#files[@]})); then
     jq -s 'sort_by(.id)' "${files[@]}" > "$tmp/endpoints.json"
@@ -23,8 +28,8 @@ for group in $(jq -r 'keys[]' groups.json); do
   fi
 
   jq -c --arg key "ed25519:$pub" --argjson serial "$(date +%s)" \
-    --arg name "$(jq -r --arg g "$group" '.[$g].name' groups.json)" \
-    '{name: $name, key: $key, serial: $serial, endpoints: .}' \
+    --argjson group "$(jq -c --arg g "$group" '.[$g]' groups.json)" \
+    '{name: $group.name, nsfw: $group.nsfw, key: $key, serial: $serial, endpoints: .}' \
     "$tmp/endpoints.json" > "$tmp/index.json"
 
   openssl pkeyutl -sign -inkey "$key" -rawin -in "$tmp/index.json" -out "$tmp/sig.bin"
@@ -33,4 +38,4 @@ for group in $(jq -r 'keys[]' groups.json); do
     '{format: "anibeam-endpoint-repo", version: 1, payload: $payload, signature: $signature}' > "index/$group.json"
 
   echo "index/$group.json: $(jq length "$tmp/endpoints.json") endpoints, key ed25519:$pub"
-done
+done < <(jq -r 'keys[]' groups.json)

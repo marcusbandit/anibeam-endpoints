@@ -8,7 +8,11 @@ fail=0
 err() { echo "error: $*" >&2; fail=1; }
 
 shopt -s nullglob
-for stray in endpoints/*.json; do err "$stray: a definition lives in a group folder, endpoints/<group>/"; done
+jq -e 'type == "object" and length > 0 and all(to_entries[];
+         (.key | test("^[a-z0-9][a-z0-9-]*$")) and (.value.name | type == "string" and length > 0)
+         and (.value.nsfw | type == "boolean"))' groups.json >/dev/null \
+  || err "groups.json: each group needs a lower-case key, a name and a boolean nsfw"
+for stray in endpoints/*.json endpoints/*/*/; do err "$stray: a definition lives directly in endpoints/<group>/"; done
 for dir in endpoints/*/; do
   g=$(basename "$dir")
   jq -e --arg g "$g" 'has($g)' groups.json >/dev/null || err "endpoints/$g/: no group \"$g\" in groups.json"
@@ -41,7 +45,9 @@ for f in "${files[@]}"; do
     [[ -z "$key" || "$url" == *"{$key}"* ]] || err "$f: auth key \"$key\" never appears in url"
   done < <(jq -r '.auth[].key' "$f")
 
-  if [[ -n "$base" ]] && old=$(git show "$base:$f" 2>/dev/null); then
+  # Found by id, not path, so a definition moved between groups still has to raise its version.
+  oldpath=$([[ -n "$base" ]] && git ls-tree -r --name-only "$base" -- endpoints | awk -F/ -v n="$id.json" '$NF == n' | head -1 || true)
+  if [[ -n "$oldpath" ]] && old=$(git show "$base:$oldpath" 2>/dev/null); then
     if ! diff -q <(jq -S . <<<"$old") <(jq -S . "$f") >/dev/null; then
       ov=$(jq .version <<<"$old"); nv=$(jq .version "$f")
       ((nv > ov)) || err "$f: changed but version did not go up ($ov -> $nv)"
