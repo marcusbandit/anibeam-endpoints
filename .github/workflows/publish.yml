@@ -33,13 +33,20 @@ jobs:
           printf '%s\n' "$SIGNING_KEY" > "$RUNNER_TEMP/key.pem"
           scripts/build-index.sh "$RUNNER_TEMP/key.pem"
           rm -f "$RUNNER_TEMP/key.pem"
-          scripts/verify.sh repo.json >/dev/null
-      - name: Commit the index if the endpoints changed
+          for f in index/*.json; do scripts/verify.sh "$f" >/dev/null; done
+      - name: Commit the indexes whose endpoints changed
         run: |
-          old=$(git show HEAD:repo.json 2>/dev/null | jq -r .payload | base64 -d | jq -c .endpoints || true)
-          new=$(jq -r .payload repo.json | base64 -d | jq -c .endpoints)
-          if [ "$old" = "$new" ]; then exit 0; fi
-          git add repo.json
+          changed=()
+          for f in index/*.json; do
+            old=$(git show "HEAD:$f" 2>/dev/null | jq -r .payload | base64 -d | jq -c 'del(.serial)' || true)
+            new=$(jq -r .payload "$f" | base64 -d | jq -c 'del(.serial)')
+            [ "$old" = "$new" ] || changed+=("$f")
+          done
+          # Every index is re-signed on each run; only the ones whose content or key changed are
+          # committed, along with any index whose group was removed.
+          gone=$(git ls-files --deleted -- index)
+          if [ ${#changed[@]} -eq 0 ] && [ -z "$gone" ]; then exit 0; fi
+          git add -- "${changed[@]}" $gone
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "chore(index): rebuild and sign [skip ci]"

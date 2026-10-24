@@ -1,0 +1,15 @@
+{
+  "id": "sukebei",
+  "name": "Sukebei",
+  "version": 1,
+  "lang": "all",
+  "kind": "nyaa",
+  "url": "https://sukebei.nyaa.si/",
+  "auth": [],
+  "front": null,
+  "rate": { "per_minute": 30 },
+  "nsfw": true,
+  "category": "0_0",
+  "filter": "0",
+  "min_core": "2.1.0"
+}
