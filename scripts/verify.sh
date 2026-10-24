@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Checks repo.json's signature against its own key and prints the decoded index.
+# Checks an index file's signature against its own key and prints the decoded index.
 # The app does the same, then pins the key the first time a repo is added.
-# Usage: scripts/verify.sh [repo.json]
+# Usage: scripts/verify.sh [index/<group>.json]
 set -euo pipefail
-file=${1:-"$(dirname "$0")/../repo.json"}
+file=${1:-"$(dirname "$0")/../index/general.json"}
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 

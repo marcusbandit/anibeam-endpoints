@@ -1,0 +1,4 @@
+{
+  "general": { "name": "Marcus's endpoints", "nsfw": false },
+  "nsfw": { "name": "Marcus's endpoints, NSFW", "nsfw": true }
+}
