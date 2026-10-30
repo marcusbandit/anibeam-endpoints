@@ -1,0 +1,28 @@
+{
+  "id": "1337x-jackett",
+  "name": "1337x (Jackett)",
+  "version": 1,
+  "lang": "all",
+  "kind": "torznab",
+  "url": "http://{host}/api/v2.0/indexers/1337x/results/torznab/api?apikey={apikey}&t=search&q={query}",
+  "auth": [
+    {
+      "key": "host",
+      "label": "Jackett address (usually port 9117)",
+      "secret": false,
+      "help": "Where your own Jackett runs, as host or host:port, such as 192.168.1.10:9117, with 1337x added as an indexer. 1337x answers with a Cloudflare challenge, so Jackett needs FlareSolverr set up to reach it.",
+      "help_url": "https://github.com/Jackett/Jackett#configuring-flaresolverr"
+    },
+    {
+      "key": "apikey",
+      "label": "Jackett API key",
+      "secret": true,
+      "help": "Copy the API Key shown at the top of Jackett's dashboard.",
+      "help_url": "https://github.com/Jackett/Jackett"
+    }
+  ],
+  "front": null,
+  "rate": { "per_minute": 20 },
+  "nsfw": false,
+  "min_core": "2.4.0"
+}

@@ -35,7 +35,8 @@ for f in "${files[@]}"; do
   seen[$id]=1
 
   url=$(jq -r .url "$f")
-  if [[ $(jq -r .kind "$f") == nyaa ]]; then
+  kind=$(jq -r .kind "$f")
+  if [[ $kind == nyaa ]]; then
     # The core appends ?page=rss&q=...&c=...&f=... to a nyaa url itself.
     [[ "$url" != *"?"* && "$url" != *"{query}"* ]] || err "$f: a nyaa url is the bare site, with no query string"
   else
@@ -44,6 +45,27 @@ for f in "${files[@]}"; do
   while read -r key; do
     [[ -z "$key" || "$url" == *"{$key}"* ]] || err "$f: auth key \"$key\" never appears in url"
   done < <(jq -r '.auth[].key' "$f")
+  # Every placeholder is {query} or an auth key, as the core reads them: from a { to the next }.
+  while read -r p; do
+    [[ -z "$p" || "$p" == query ]] || jq -e --arg p "$p" 'any(.auth[]; .key == $p)' "$f" >/dev/null \
+      || err "$f: url has {$p}, which is neither {query} nor an auth key"
+  done < <(jq -r '.url | [scan("\\{([^}]*)\\}")[0]] | .[]' "$f")
+
+  # The host is literal, so a credential cannot pick where it goes. The one exception is a
+  # torznab url whose whole authority is {host}: the person's own Prowlarr or Jackett, from a
+  # field they can see. The schema allows plain http:// only in that form.
+  rest=${url#*://}
+  authority=${rest%%[/?#]*}
+  if [[ "$authority" == "{host}" ]]; then
+    [[ $kind == torznab ]] || err "$f: only a torznab url may name its host as {host}"
+    jq -e 'any(.auth[]; .key == "host" and .secret)' "$f" >/dev/null \
+      && err "$f: the host auth field must not be secret"
+  else
+    host=${authority##*@}
+    host=${host%%:*}
+    [[ -n "$host" ]] || err "$f: url has no host"
+    [[ "$host" != *"{"* ]] || err "$f: a placeholder in the host"
+  fi
 
   # Found by id, not path, so a definition moved between groups still has to raise its version.
   oldpath=$([[ -n "$base" ]] && git ls-tree -r --name-only "$base" -- endpoints | awk -F/ -v n="$id.json" '$NF == n' | head -1 || true)

@@ -5,13 +5,23 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "name", "version", "lang", "kind", "url", "auth", "min_core"],
+  "if": { "properties": { "kind": { "const": "torznab" } } },
+  "then": {
+    "properties": {
+      "url": {
+        "$comment": "A torznab url may name the person's own Prowlarr or Jackett as {host}, the whole authority, and only then be plain http.",
+        "pattern": "^(https://|http://\\{host\\}([/?#]|$))"
+      }
+    }
+  },
+  "else": { "properties": { "url": { "pattern": "^https://" } } },
   "properties": {
     "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
     "name": { "type": "string", "minLength": 1 },
     "version": { "type": "integer", "minimum": 1 },
     "lang": { "type": "string", "pattern": "^([a-z]{2}|all)$" },
-    "kind": { "enum": ["nyaa", "rss", "tosho"] },
-    "url": { "type": "string", "pattern": "^https://" },
+    "kind": { "enum": ["nyaa", "rss", "tosho", "torznab"] },
+    "url": { "type": "string" },
     "auth": {
       "type": "array",
       "items": {
