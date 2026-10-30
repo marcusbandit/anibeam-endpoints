@@ -2,7 +2,7 @@
 
 Endpoint definitions for [AniBeam](https://github.com/marcusbandit/AniBeam). The endpoints come in groups, and a user adds each group in AniBeam on its own by pasting the raw URL of its index, then installs endpoints from it one at a time. The format and the reasons behind it are in AniBeam's spec, `docs/superpowers/specs/2026-10-24-endpoint-repos.md` (issue #143).
 
-A definition is data. Nothing in it runs. Each endpoint kind (`nyaa`, `rss`, `tosho`) is code inside AniBeam's core.
+A definition is data. Nothing in it runs. Each endpoint kind (`nyaa`, `rss`, `tosho`, `torznab`) is code inside AniBeam's core.
 
 ## Layout
 
@@ -30,7 +30,7 @@ Every group is signed with it. AniBeam shows this key when a group is added and 
 ## Adding an endpoint
 
 1. Check the site by hand: does a search need an API key, a token, a login, or nothing; what rate it tolerates.
-2. Write `endpoints/<group>/<id>.json`: `general` for most things, `nsfw` for adult sites. Put each `auth` key in the URL as `{key}`, next to `{query}`.
+2. Write `endpoints/<group>/<id>.json`: `general` for most things, `nsfw` for adult sites. Put each `auth` key in the URL as `{key}`, next to `{query}`. The host stays literal, except that a `torznab` URL may name the user's own Prowlarr or Jackett as `{host}`, its whole authority, from a non-secret `host` field; only that form may be plain `http://`.
 3. Run `scripts/check.sh` (needs `jq` and `check-jsonschema`).
 4. Open a PR. CI checks every file and refuses a changed definition whose `version` did not go up.
 5. Merge. CI rebuilds and signs the group's index and commits it.
