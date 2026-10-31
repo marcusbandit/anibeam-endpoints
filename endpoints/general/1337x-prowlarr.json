@@ -10,14 +10,14 @@
       "key": "host",
       "label": "Prowlarr address (usually port 9696)",
       "secret": false,
-      "help": "Where your own Prowlarr runs, as host or host:port, such as 192.168.1.10:9696, with 1337x added as an indexer. 1337x answers with a Cloudflare challenge, so add FlareSolverr in Prowlarr under Settings > Indexers > Indexer Proxies and give it the same tag as the 1337x indexer.",
+      "help": "Where your own Prowlarr runs, as host or host:port over plain http with no URL base, such as 192.168.1.10:9696, with 1337x added as an indexer. 1337x answers with a Cloudflare challenge, so add FlareSolverr in Prowlarr under Settings > Indexers > Indexer Proxies and give it the same tag as the 1337x indexer.",
       "help_url": "https://wiki.servarr.com/prowlarr/settings#indexer-proxies"
     },
     {
       "key": "indexer",
       "label": "Prowlarr indexer id of 1337x",
       "secret": false,
-      "help": "A number. In Prowlarr open Indexers and click 1337x: the number in its Torznab URL, such as the 3 in http://192.168.1.10:9696/3/, is the id.",
+      "help": "Only the number, not a URL or a name. In Prowlarr open Indexers and click 1337x: its Torznab URL reads like http://192.168.1.10:9696/3/, and the 3 is the id.",
       "help_url": "https://wiki.servarr.com/prowlarr/indexers#viewing-an-indexer-id-or-url"
     },
     {
@@ -29,7 +29,6 @@
     }
   ],
   "front": null,
-  "rate": { "per_minute": 20 },
   "nsfw": false,
   "min_core": "2.4.0"
 }

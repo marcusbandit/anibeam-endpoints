@@ -47,9 +47,11 @@ for f in "${files[@]}"; do
   done < <(jq -r '.auth[].key' "$f")
   # Every placeholder is {query} or an auth key, as the core reads them: from a { to the next }.
   while read -r p; do
-    [[ -z "$p" || "$p" == query ]] || jq -e --arg p "$p" 'any(.auth[]; .key == $p)' "$f" >/dev/null \
+    [[ "$p" == query ]] || jq -e --arg p "$p" 'any(.auth[]; .key == $p)' "$f" >/dev/null \
       || err "$f: url has {$p}, which is neither {query} nor an auth key"
   done < <(jq -r '.url | [scan("\\{([^}]*)\\}")[0]] | .[]' "$f")
+  jq -e 'any(.auth[]; .key == "query")' "$f" >/dev/null && err "$f: an auth key may not be named query"
+  jq -e '[.auth[].key] | length != (unique | length)' "$f" >/dev/null && err "$f: two auth fields share a key"
 
   # The host is literal, so a credential cannot pick where it goes. The one exception is a
   # torznab url whose whole authority is {host}: the person's own Prowlarr or Jackett, from a

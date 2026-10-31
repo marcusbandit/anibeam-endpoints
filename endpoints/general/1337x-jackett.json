@@ -10,7 +10,7 @@
       "key": "host",
       "label": "Jackett address (usually port 9117)",
       "secret": false,
-      "help": "Where your own Jackett runs, as host or host:port, such as 192.168.1.10:9117, with 1337x added as an indexer. 1337x answers with a Cloudflare challenge, so Jackett needs FlareSolverr set up to reach it.",
+      "help": "Where your own Jackett runs, as host or host:port over plain http with no URL base, such as 192.168.1.10:9117, with 1337x added as an indexer. 1337x answers with a Cloudflare challenge, so Jackett needs FlareSolverr set up to reach it.",
       "help_url": "https://github.com/Jackett/Jackett#configuring-flaresolverr"
     },
     {
@@ -22,7 +22,6 @@
     }
   ],
   "front": null,
-  "rate": { "per_minute": 20 },
   "nsfw": false,
   "min_core": "2.4.0"
 }
