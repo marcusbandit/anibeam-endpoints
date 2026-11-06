@@ -36,9 +36,9 @@ for f in "${files[@]}"; do
 
   url=$(jq -r .url "$f")
   kind=$(jq -r .kind "$f")
-  if [[ $kind == nyaa ]]; then
-    # The core appends ?page=rss&q=...&c=...&f=... to a nyaa url itself.
-    [[ "$url" != *"?"* && "$url" != *"{query}"* ]] || err "$f: a nyaa url is the bare site, with no query string"
+  if [[ $kind == filtered-rss ]]; then
+    # The core appends ?page=rss&q=...&c=...&f=... to a filtered-rss url itself.
+    [[ "$url" != *"?"* && "$url" != *"{query}"* ]] || err "$f: a filtered-rss url is the bare site, with no query string"
   else
     [[ "$url" == *"{query}"* ]] || err "$f: url has no {query} placeholder"
   fi
@@ -68,6 +68,26 @@ for f in "${files[@]}"; do
     [[ -n "$host" ]] || err "$f: url has no host"
     [[ "$host" != *"{"* ]] || err "$f: a placeholder in the host"
   fi
+
+  # What AniBeam's core holds a definition to beyond the schema, so CI refuses what the core
+  # would silently skip: the rss-only fields on an rss endpoint, a show feed on the endpoint's
+  # own host whose page patterns compile and name a slug group, and trusted groups with no
+  # control characters.
+  if jq -e '.quality_local or .one_variant or .show_feed' "$f" >/dev/null; then
+    [[ $kind == rss ]] || err "$f: quality_local, one_variant and show_feed are for an rss endpoint"
+  fi
+  if jq -e '.show_feed' "$f" >/dev/null; then
+    feed=$(jq -r '.show_feed.url' "$f")
+    feedhost=${feed#https://}; feedhost=${feedhost%%[/?#]*}
+    urlhost=${url#*://}; urlhost=${urlhost%%[/?#]*}; urlhost=${urlhost##*@}
+    [[ "${feedhost,,}" == "${urlhost,,}" ]] || err "$f: show_feed url is on $feedhost, not the endpoint's own $urlhost"
+    while read -r p; do
+      python3 -c 'import re,sys; r=re.compile(sys.argv[1]); sys.exit(0 if "slug" in r.groupindex else 3)' "$p" 2>/dev/null \
+        || err "$f: show_feed page pattern does not compile or has no group named slug: $p"
+    done < <(jq -r '.show_feed.pages[]' "$f")
+  fi
+  jq -e 'any(.trusted_groups[]?; test("[[:cntrl:]]"))' "$f" >/dev/null \
+    && err "$f: a trusted group holds a control character"
 
   # Found by id, not path, so a definition moved between groups still has to raise its version.
   oldpath=$([[ -n "$base" ]] && git ls-tree -r --name-only "$base" -- endpoints | awk -F/ -v n="$id.json" '$NF == n' | head -1 || true)

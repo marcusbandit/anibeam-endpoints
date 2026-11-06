@@ -2,7 +2,19 @@
 
 Endpoint definitions for [AniBeam](https://github.com/marcusbandit/AniBeam). The endpoints come in groups, and a user adds each group in AniBeam on its own by pasting the raw URL of its index, then installs endpoints from it one at a time. The format and the reasons behind it are in AniBeam's spec, `docs/superpowers/specs/2026-10-24-endpoint-repos.md` (issue #143).
 
-A definition is data. Nothing in it runs. Each endpoint kind (`nyaa`, `rss`, `tosho`, `torznab`) is code inside AniBeam's core.
+A definition is data. Nothing in it runs. Each endpoint kind is code inside AniBeam's core, named for the shape of what it reads, never for a site:
+
+- `filtered-rss`: a bare site address the core turns into an RSS search with `category` and `filter`, asked again unfiltered when the filter finds nothing
+- `rss`: any RSS feed whose `url` holds `{query}`
+- `json-feed`: a JSON feed of torrent entries in one fixed layout, its `url` holding `{query}`
+- `torznab`: an indexer's torznab search, read as RSS
+
+A definition can also carry, as data:
+
+- `trusted_groups`: release groups best fit prefers out of the box
+- for an `rss` endpoint, `quality_local` (its search matches post text only, so quality words narrow the results in AniBeam instead), `one_variant` (a subscription that names no variant excludes this word) and `show_feed` (patterns that read a show's slug from a result's post page, and the show's own feed on the same host)
+
+Kinds were renamed in definition version 2 (`nyaa` became `filtered-rss`, `tosho` became `json-feed`, AniBeam#602); those definitions and the ones with the fields above need an AniBeam that has AniBeam#602, #603 and #604, the first being 2.4.0 (`min_core`). A 2.4.0 nightly from before those would store such a definition without the fields it does not know, so they merge here only once all three are on AniBeam's main.
 
 ## Layout
 
