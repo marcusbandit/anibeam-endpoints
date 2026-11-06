@@ -36,9 +36,9 @@ for f in "${files[@]}"; do
 
   url=$(jq -r .url "$f")
   kind=$(jq -r .kind "$f")
-  if [[ $kind == nyaa ]]; then
-    # The core appends ?page=rss&q=...&c=...&f=... to a nyaa url itself.
-    [[ "$url" != *"?"* && "$url" != *"{query}"* ]] || err "$f: a nyaa url is the bare site, with no query string"
+  if [[ $kind == filtered-rss ]]; then
+    # The core appends ?page=rss&q=...&c=...&f=... to a filtered-rss url itself.
+    [[ "$url" != *"?"* && "$url" != *"{query}"* ]] || err "$f: a filtered-rss url is the bare site, with no query string"
   else
     [[ "$url" == *"{query}"* ]] || err "$f: url has no {query} placeholder"
   fi

@@ -1,9 +1,9 @@
 {
   "id": "nyaa",
   "name": "Nyaa",
-  "version": 1,
+  "version": 2,
   "lang": "all",
-  "kind": "nyaa",
+  "kind": "filtered-rss",
   "url": "https://nyaa.si/",
   "auth": [],
   "front": "ddos-guard.net",
@@ -11,5 +11,6 @@
   "nsfw": false,
   "category": "1_0",
   "filter": "0",
-  "min_core": "2.1.0"
+  "min_core": "2.4.0",
+  "trusted_groups": ["Erai-raws", "SubsPlease", "ASW", "EMBER", "Judas", "Osiris", "Moozzi2", "VCB-Studio", "Kawaiika-Raws"]
 }
