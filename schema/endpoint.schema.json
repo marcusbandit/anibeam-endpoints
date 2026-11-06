@@ -52,7 +52,7 @@
       "$comment": "Release groups best fit prefers out of the box: AniBeam trusts the groups its enabled endpoints list.",
       "type": "array",
       "maxItems": 32,
-      "items": { "type": "string", "minLength": 1, "maxLength": 64 }
+      "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^\\S(.*\\S)?$" }
     },
     "quality_local": {
       "$comment": "rss only: the search matches post text, so AniBeam takes quality words out of it and narrows the results itself.",
